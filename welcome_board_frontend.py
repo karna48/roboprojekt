@@ -81,7 +81,7 @@ def draw_board(state, available_robots, window, own_robot_name):
                     player_sprite_proxy.image = loaded_robots_images[robot.name]
                     player_sprite_proxy.x = x
                     player_sprite_proxy.y = y
-                    player_sprite_proxy().draw()
+                    player_sprite_proxy.draw()
                     robot_name_label = get_label(
                         str(robot.displayed_name), player_sprite_proxy.x + 30, player_sprite_proxy.y - 26,
                         16, "center", (0, 0, 0, 255),

@@ -53,7 +53,6 @@ def window_zoom(window, WINDOW_WIDTH, WINDOW_HEIGHT):
 #        after a window with correct GL context is created
 def _init_module_after_gl_context():
     """ loads sprites into global variables after a GL context is created. """
-    global player_sprite_proxy
     # Loading of robots images
     for image_path in Path('./img/robots/png').iterdir():
         loaded_robots_images[image_path.stem] = pyglet.image.load(str(image_path))
@@ -81,7 +80,5 @@ class PlayerSpriteProxy:
             self.__dict__[name] = value
         else:
             setattr(self._actual_sprite, name, value)
-    def __call__(self):
-        return self._actual_sprite
 
 player_sprite_proxy = PlayerSpriteProxy()
