@@ -1,9 +1,5 @@
 import pyglet
 from pyglet.gl import Config as GLConfig
-
-# [FIX] enable deprecated APIs such as gl.gl_compat.glPushMatrix
-gl_config = GLConfig(major_version=2, minor_version=1, forward_compatible=False)
-
 from util_frontend import get_sprite, get_label, window_zoom
 from util_frontend import (loaded_robots_images, player_sprite_proxy,
                            _init_module_after_gl_context as _util_frontend_init_module_after_gl_context)
@@ -12,26 +8,24 @@ from util_frontend import (loaded_robots_images, player_sprite_proxy,
 WINDOW_WIDTH = 1030
 WINDOW_HEIGHT = 578
 
-# Background
-background_sprite = None # init in _init_module_after_gl_context
-# Border of available robot's picture
-border_sprite = None # init in _init_module_after_gl_context
-robot_background_sprite = None # init in _init_module_after_gl_context
-
 picture_coordinates = []
 for i in range(8):
     x = 50 + i * 120
     y = 120
     picture_coordinates.append((x, y))
 
-not_available_label = None
+_init_module_after_gl_context_called = False
 
 def _init_module_after_gl_context():
     """ loads sprites into global variables after a GL context is created. """
     global background_sprite, border_sprite, robot_background_sprite
     global not_available_label
+    global _init_module_after_gl_context_called
+    _init_module_after_gl_context_called = True
 
+    # Background
     background_sprite = get_sprite('img/interface/png/board.png', x=0, y=0)
+    # Border of available robot's picture
     border_sprite = get_sprite('img/interface/png/border.png')
     robot_background_sprite = get_sprite('img/interface/png/robot_bcg.png')
 
@@ -47,12 +41,12 @@ def create_window(on_draw, on_mouse_press, on_text, on_text_motion):
     """
     Return a pyglet window for graphic output.
     """
+    gl_config = GLConfig(major_version=2, minor_version=1, forward_compatible=False)
     window = pyglet.window.Window(WINDOW_WIDTH, WINDOW_HEIGHT,
                                   config=gl_config, resizable=True)
 
-    if background_sprite is None:
-        _init_module_after_gl_context()
-        _util_frontend_init_module_after_gl_context()
+    _init_module_after_gl_context()
+    _util_frontend_init_module_after_gl_context()
 
     window.push_handlers(
         on_draw=on_draw,

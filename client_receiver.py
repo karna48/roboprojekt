@@ -109,7 +109,6 @@ def main(hostname):
     # Schedule the "client" task
     # More about Futures - official documentation
     # https://docs.python.org/3/library/asyncio-future.html
-    # [FIX] RuntimeError: There is no current event loop in thread 'MainThread'.
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     asyncio.ensure_future(receiver.get_game_state())

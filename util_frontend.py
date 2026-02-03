@@ -49,10 +49,15 @@ def window_zoom(window, WINDOW_WIDTH, WINDOW_HEIGHT):
     pyglet.gl.gl_compat.glPopMatrix()
 
 
-# [FIX]  because of the gl.gl_compat functions we need to load sprites
-#        after a window with correct GL context is created
+_init_module_after_gl_context_called = False
+
 def _init_module_after_gl_context():
     """ loads sprites into global variables after a GL context is created. """
+    global _init_module_after_gl_context_called
+    if _init_module_after_gl_context_called:
+        return
+    _init_module_after_gl_context_called = True
+
     # Loading of robots images
     for image_path in Path('./img/robots/png').iterdir():
         loaded_robots_images[image_path.stem] = pyglet.image.load(str(image_path))
@@ -61,9 +66,11 @@ def _init_module_after_gl_context():
     player_sprite_proxy._set_actual_sprite(get_sprite('img/robots/png/bender.png'))
 
 loaded_robots_images = {}  # initialized in init_module_after_gl_context
-# [FIX] player_sprite is used from multiple modules in same running program
-#       and cannot be created as None -> a proxy object
+
 class PlayerSpriteProxy:
+    # player_sprite is used from multiple modules in same running program
+    # and cannot be created as None -> a proxy object
+
     def __init__(self):
         self.__dict__['_actual_sprite'] = None
 

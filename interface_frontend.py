@@ -1,8 +1,7 @@
 import pyglet
-from pyglet.gl import Config as GLConfig
-# [FIX] enable deprecated APIs such as gl.gl_compat.glPushMatrix
-gl_config = GLConfig(major_version=2, minor_version=1, forward_compatible=False)
+pyglet.options['shadow_window'] = False
 
+from pyglet.gl import Config as GLConfig
 from time import monotonic
 
 from util_frontend import TILE_WIDTH, TILE_HEIGHT, get_label, get_sprite
@@ -22,12 +21,12 @@ def create_window(on_draw, on_text, on_mouse_press, on_close):
     """
     Return a pyglet window for graphic output.
     """
+    gl_config = GLConfig(major_version=2, minor_version=1, forward_compatible=False)
     window = pyglet.window.Window(WINDOW_WIDTH, WINDOW_HEIGHT,
                                   config=gl_config, resizable=True)
 
-    if interface_sprite is None:
-        _util_frontend_init_module_after_gl_context()
-        _init_module_after_gl_context()
+    _util_frontend_init_module_after_gl_context()
+    _init_module_after_gl_context()
 
     window.push_handlers(
         on_draw=on_draw,
@@ -37,27 +36,48 @@ def create_window(on_draw, on_text, on_mouse_press, on_close):
     )
     return window
 
+_init_module_after_gl_context_called = False
+
 def _init_module_after_gl_context():
     global interface_sprite, power_down_sprite, power_down_player_sprite
     global crown_sprite, loss_sprite, indicator_green_sprite, indicator_red_sprite
     global card_background_sprite, own_border_sprite, select_sprite
     global cursor_sprite, you_win_sprite, winner_of_the_game_sprite
     global game_over_sprite, players_background, my_robot_sprite, flag_slot_sprite
+    global _init_module_after_gl_context_called
+    if _init_module_after_gl_context_called:
+        return
+    _init_module_after_gl_context_called = True
+
+    # Interface element sprites
+    # Interface background
     interface_sprite = get_sprite('img/interface/png/interface.png', x=0, y=0)
     power_down_sprite = get_sprite('img/interface/png/power.png', x=210, y=900)
     power_down_player_sprite = get_sprite('img/interface/png/power_player.png')
+    # Winner crown
     crown_sprite = get_sprite('img/interface/png/crown.png')
+    # Loss crown
     loss_sprite = get_sprite('img/interface/png/no_crown.png')
+    # Time indicator
     indicator_green_sprite = get_sprite('img/interface/png/green.png', x=688, y=864)
+    # Time indicator
     indicator_red_sprite = get_sprite('img/interface/png/red.png', x=688, y=864)
+    # Universal cards background
     card_background_sprite = get_sprite('img/interface/png/card_bg.png')
+    # Own robot's border
     own_border_sprite = get_sprite('img/interface/png/own_border.png', x=33, y=42)
+    # Gray overlay on selected cards
     select_sprite = get_sprite('img/interface/png/card_cv.png')
+    # Selection cursor
     cursor_sprite = get_sprite('img/interface/png/card_sl.png')
+    # Winner
     you_win_sprite = get_sprite('img/interface/png/winner.png', x=160, y=290)
     winner_of_the_game_sprite = get_sprite('img/interface/png/game_winner.png', x=160, y=200)
+    # Game over
     game_over_sprite = get_sprite('img/interface/png/game_over.png', x=140, y=280)
+    # Other robot card
     players_background = get_sprite('img/interface/png/player.png')
+    # My_robot_sprite, below replaced with the actual image.
     my_robot_sprite = get_sprite('img/robots/png/bender.png', x=64, y=882)
     flag_slot_sprite = get_sprite('img/interface/png/flag_slot.png')
 
@@ -104,42 +124,8 @@ def _init_module_after_gl_context():
         x = x + i * 144
         program_coordinates.append((x, y))
 
-# Interface element sprites
-# Interface background
-interface_sprite = None # init inside _init_module_after_gl_context
-power_down_sprite = None # init inside _init_module_after_gl_context
-power_down_player_sprite = None # init inside _init_module_after_gl_context
-# Winner crown
-crown_sprite = None # init inside _init_module_after_gl_context
-# Loss crown
-loss_sprite = None # init inside _init_module_after_gl_context
-# Time indicator
-indicator_green_sprite = None # init inside _init_module_after_gl_context
-# Time indicator
-indicator_red_sprite = None # init inside _init_module_after_gl_context
-# Universal cards background
-card_background_sprite = None # init inside _init_module_after_gl_context
-# Own robot's border
-own_border_sprite = None # init inside _init_module_after_gl_context
-# Gray overlay on selected cards
-select_sprite = None # init inside _init_module_after_gl_context
-# Selection cursor
-cursor_sprite = None # init inside _init_module_after_gl_context
-# Winner
-you_win_sprite = None # init inside _init_module_after_gl_context
-winner_of_the_game_sprite = None # init inside _init_module_after_gl_context
-# Game over
-game_over_sprite = None # init inside _init_module_after_gl_context
-# Other robot card
-players_background = None # init inside _init_module_after_gl_context
-# My_robot_sprite, below replaced with the actual image.
-my_robot_sprite = None # init inside _init_module_after_gl_context
-
 lives_sprites = []
-
 flags_sprites = []
-
-flag_slot_sprite = None # init inside _init_module_after_gl_context
 
 # Tokens of damage
 damages_tokens_sprites = []

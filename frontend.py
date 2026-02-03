@@ -5,11 +5,9 @@ The frontend module
 """
 
 import pyglet
+pyglet.options['shadow_window'] = False
+
 from pyglet.gl import Config as GLConfig
-
-# [FIX] enable deprecated APIs such as gl.gl_compat.glPushMatrix
-gl_config = GLConfig(major_version=2, minor_version=1, forward_compatible=False)
-
 from pathlib import Path
 from time import monotonic
 from util_frontend import (TILE_WIDTH, TILE_HEIGHT, get_label, get_sprite, window_zoom,
@@ -19,20 +17,20 @@ import math
 
 loaded_tiles_images = {}  # init inside _init_module_after_gl_context
 loaded_robots_images = {} # init inside _init_module_after_gl_context
-# Border of available robot's picture
-border_sprite = None # init inside _init_module_after_gl_context
-# Winner
-winner_sprite = None # init inside _init_module_after_gl_context
-# Game over
-# game_over_sprite = None # init inside _init_module_after_gl_context
 
+_init_module_after_gl_context_called = False
 
-# [FIX]  because of the gl.gl_compat functions we need to load sprites
-#        after a window with correct GL context is created
-# Loading of tiles and robots images
 def _init_module_after_gl_context():
+    """ Loading of tiles and robots images
+        because of the gl.gl_compat functions we need to load sprites
+        after a window with correct GL context is created
+    """
     global loaded_tiles_images, loaded_robots_images
     global border_sprite, winner_sprite #, game_over_sprite
+    global _init_module_after_gl_context_called
+    if _init_module_after_gl_context_called:
+        return
+    _init_module_after_gl_context_called = True
 
     for image_path in Path('./img/tiles/png').iterdir():
         loaded_tiles_images[image_path.stem] = pyglet.image.load(str(image_path))
@@ -55,13 +53,12 @@ def create_window(state, on_draw):
 
     state: State object containing game board, robots and map sizes
     """
-
+    gl_config = GLConfig(major_version=2, minor_version=1, forward_compatible=False)
     window = pyglet.window.Window(state.tile_count[0] * TILE_WIDTH,
                                   state.tile_count[1] * TILE_HEIGHT + 50,
                                   config=gl_config, resizable=True)
-    if not loaded_tiles_images:
-        _util_frontend_init_module_after_gl_context()
-        _init_module_after_gl_context()
+    _util_frontend_init_module_after_gl_context()
+    _init_module_after_gl_context()
 
     window.push_handlers(on_draw=on_draw)
     return window

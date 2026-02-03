@@ -56,7 +56,6 @@ def export_svg_png():
         new_name.parent.mkdir(exist_ok=True, parents=True)
         # launch Inkscape and export all images to PNG format
         # More info about subprocess in official documentation - https://docs.python.org/3/library/subprocess.html
-        # [FIX] Inkscape 1.2.2: Warning: Option --export-png= is deprecated  -> using --export-filename=
         print(name)
         subprocess.run([INKSCAPE, name, "--export-filename="+str(new_name), "--export-area-page"], check=True)
 

@@ -58,7 +58,6 @@ def get_tiles_data(map_data):
     except KeyError:
         loaded_tileset = map_data['tilesets'][0]['tiles']
 
-    # [FIX] Python 3.14 PEP 765 violation: return inside finally block
     return loaded_tileset
 
 
